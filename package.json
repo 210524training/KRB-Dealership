@@ -1,0 +1,34 @@
+{
+  "name": "project0",
+  "version": "1.0.0",
+  "description": "The Car Dealership app is a console-based application that facilitates the purchasing of cars.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:cov": "jest --coverage",
+    "start": "ts-node src/index.ts",
+    "lint": "eslint **/src/**",
+    "lint:fix": "eslint **/src/** --fix",
+    "tsc": "tsc"
+  },
+  "author": "Kyle Bartolucci",
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^8.1.0",
+    "log4js": "^6.3.0"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^7.3.1",
+    "@types/jest": "^26.0.23",
+    "@types/node": "^15.6.1",
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
+    "eslint": "^7.27.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.3",
+    "jest": "^27.0.1",
+    "ts-jest": "^27.0.1",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.2"
+  }
+}
