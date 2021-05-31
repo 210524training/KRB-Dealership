@@ -1,1 +1,1 @@
-[]
+[{"id":"thtmg","customer":{"username":"a","password":"a","id":"obtoco","customerCars":[]},"car":{"id":"123456","model":"elantra","price":16000,"purchasePrice":null,"monthlyPayment":null,"remainingPayments":null,"status":"Available"},"offer":123222,"offerStatus":"Pending"}]

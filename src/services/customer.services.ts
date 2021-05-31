@@ -1,10 +1,10 @@
 /* eslint-disable class-methods-use-this */
 import fs from 'fs';
-import inquirer from 'inquirer';
 import Car from '../models/car';
 import Customer from '../models/customer';
-import Offer from '../models/offer';
 import Lot from '../models/lot';
+import Offer from '../models/offer';
+import { rl } from './input.service';
 import EmployeeService from './employee.services';
 
 class CustomerService {
@@ -13,11 +13,11 @@ class CustomerService {
   ) {}
 
   findByUsername(username: string): Customer | undefined {
-    return this.customers.find((customer) => customer.getUsername === username);
+    return this.customers.find((customer) => customer.username === username);
   }
 
   register(currentCustomer: Customer): void {
-    if(!this.findByUsername(currentCustomer.getUsername)) {
+    if(!this.findByUsername(currentCustomer.username)) {
       this.customers.push(currentCustomer);
     }
     this.save();
@@ -67,28 +67,39 @@ class CustomerService {
     );
   }
 
-  makeOffer(currentCustomer: Customer): void {
-    inquirer.prompt([
-      {
-        name: 'car',
-        type: 'list',
-        message: 'What is the car you want to make an offer on?\n',
-        choices: Lot.viewCarsInLot,
-      },
-      {
-        name: 'offer',
-        type: 'input',
-        message: 'What is the ID of the car you want to make an offer on?\n',
-      },
-    ]).then((answers: any) => EmployeeService.offers.push(
-      new Offer(
+  async queryCarId(): Promise<string> {
+    return new Promise<string>((resolve) => {
+      rl.question(
+        'Enter the id of the car you want to make a offer on:\n',
+        (answer) => { resolve(answer); },
+      );
+    });
+  }
+
+  async queryOfferAmount(): Promise<number> {
+    return new Promise<number>((resolve) => {
+      rl.question(
+        'How much is the offer?\n',
+        (answer) => { resolve(Number(answer)); },
+      );
+    });
+  }
+
+  async makeOffer(currentCustomer: Customer): Promise<void> {
+    if(Lot.carsLot) {
+      const carId = await this.queryCarId();
+      const offerAmount = await this.queryOfferAmount();
+      EmployeeService.offers.push(new Offer(
         Math.random().toString(36).substring(7),
         currentCustomer,
-        answers.car,
-        answers.offer,
+        Lot.findByCarId((carId)),
+        offerAmount,
         'Pending',
-      ),
-    ));
+      ));
+    } else {
+      console.log('There are no cars available to make an offer on');
+      throw new Error('Failed to make an offer');
+    }
   }
 
   viewMyCars(currentCustomer: Customer): void {
@@ -96,7 +107,7 @@ class CustomerService {
   }
 
   viewRemainingPayments(currentCar: Car): void {
-    console.log(currentCar.getRemainingPayments);
+    console.log(currentCar.remainingPayments);
   }
 }
 

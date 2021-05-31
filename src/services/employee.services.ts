@@ -6,41 +6,41 @@ class EmployeeService {
         public offers: Offer[] = [],
   ) {}
 
-  acceptOffer(currentOffer: Offer): void {
-    const isValidOffer = this.offers.find((offer) => offer === currentOffer);
-    if(isValidOffer) {
-      const offerRef = currentOffer;
-      offerRef.car.setStatus = 'Sold';
-      offerRef.car.setMonthlyPayment = (currentOffer.getOffer / 24) * 0.05;
-      offerRef.customer.customerCars.push(currentOffer.car);
-      offerRef.setOfferStatus = 'Accepted';
-      this.autoRejectOtherOffers(currentOffer);
-    }
-  }
+  // acceptOffer(currentOffer: Offer): void {
+  //   const isValidOffer = this.offers.find((offer) => offer === currentOffer);
+  //   if(isValidOffer) {
+  //     const offerRef = currentOffer;
+  //     offerRef.car.status = 'Sold';
+  //     offerRef.car.monthlyPayment = (currentOffer.offer / 24) * 0.05;
+  //     offerRef.customer.customerCars.push(currentOffer.car);
+  //     offerRef.offerStatus = 'Accepted';
+  //     this.autoRejectOtherOffers(currentOffer);
+  //   }
+  // }
 
-  autoRejectOtherOffers(currentOffer: Offer): void {
-    const allCurrentOffers = this.offers.filter(
-      (offer) => offer.car.getId === currentOffer.car.getId,
-    );
-    if(allCurrentOffers) {
-      const offersToReject = this.offers.filter(
-        (offer) => offer.customer.getId !== currentOffer.customer.getId,
-      );
-      while(offersToReject) {
-        const elementToRemove: Offer | undefined = offersToReject.pop();
-        if(elementToRemove) {
-          const index = this.offers.indexOf(elementToRemove);
-          this.offers[index].setOfferStatus = 'Rejected';
-        }
-      }
-    }
-  }
+  // autoRejectOtherOffers(currentOffer: Offer): void {
+  //   const allCurrentOffers = this.offers.filter(
+  //     (offer) => offer.car.id === currentOffer.car.id,
+  //   );
+  //   if(allCurrentOffers) {
+  //     const offersToReject = this.offers.filter(
+  //       (offer) => offer.customer.id !== currentOffer.customer.id,
+  //     );
+  //     while(offersToReject) {
+  //       const elementToRemove: Offer | undefined = offersToReject.pop();
+  //       if(elementToRemove) {
+  //         const index = this.offers.indexOf(elementToRemove);
+  //         this.offers[index].offerStatus = 'Rejected';
+  //       }
+  //     }
+  //   }
+  // }
 
   rejectOffer(currentOffer: Offer): void {
     const isValidOffer = this.offers.find((offer) => offer === currentOffer);
     if(isValidOffer) {
       const offerRef = currentOffer;
-      offerRef.setOfferStatus = 'Rejected';
+      offerRef.offerStatus = 'Rejected';
     }
   }
 

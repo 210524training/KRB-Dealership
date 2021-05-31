@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import readline from 'readline';
 import Car from '../models/car';
 import Customer from '../models/customer';
@@ -12,6 +13,9 @@ export const rl = readline.createInterface({
 
 export function exit() {
   CustomerService.save();
+  EmployeeService.save();
+  Lot.save();
+  process.exit();
 }
 
 let currentUser: Customer | undefined;
@@ -42,12 +46,11 @@ export function initialPrompt(): Promise<string> {
   });
 }
 
-export function customerPrompt(): Promise<string> {
+export async function customerPrompt(): Promise<string> {
   return new Promise<string>(
     (resolve, reject) => {
       rl.question(
         `What will you like to do?
-        0. Go Back
         1. View cars in the lot
         2. View owned carsLot
         3. Make offer for car
@@ -55,32 +58,12 @@ export function customerPrompt(): Promise<string> {
         q. exit\n`,
         (answer: string) => {
           let isValid = false;
-          if((!Number.isNaN(Number(answer)) && (Number(answer) <= 2) && (Number(answer) >= 0)) || (answer === 'q')) {
+          if((!Number.isNaN(Number(answer)) && (Number(answer) <= 4) && (Number(answer) >= 1)) || (answer === 'q')) {
             isValid = true;
           }
 
           if(isValid) {
-            switch (answer) {
-            case '0':
-              customerPrompt();
-              break;
-            case '1':
-              Lot.viewCarsInLot();
-              break;
-            case '2':
-              if(currentUser) {
-                CustomerService.viewMyCars(currentUser);
-              }
-              break;
-            case '3':
-              if(currentUser) {
-                CustomerService.makeOffer(currentUser);
-              }
-              EmployeeService.save();
-              break;
-            default:
-              throw new Error('Invalid answer');
-            }
+            resolve(answer);
           }
 
           reject();
@@ -159,51 +142,90 @@ export async function loginCustomer(): Promise<void> {
   console.log('login customer', signedInCustomer);
   if(signedInCustomer) {
     currentUser = signedInCustomer;
-    console.log(`\nWelcome ${currentUser.username}\n`);
-    await customerPrompt();
+    await receiveCustomerSelection();
+  } else {
+    throw new Error('No one signed in');
   }
-  console.log('\nCredentials were incorrect\nPlease try again...\n');
-  await loginCustomer();
-  throw new Error('Credentials were incorrect');
 }
 
-export async function receiveUserSelection(): Promise<void> {
-  let response: string;
-  if(!currentUser) {
-    response = await initialPrompt();
+export async function receiveCustomerSelection(): Promise<void> {
+  let response: string = '';
+  if(currentUser) {
+    response = await customerPrompt();
 
     switch (response) {
-    case '0':
-      // Allow the User to register
-      await attemptRegister();
-      break;
     case '1':
-      await loginCustomer();
+      Lot.viewCarsInLot();
+      await receiveCustomerSelection();
       break;
     case '2':
-      await employeePrompt();
+      if(currentUser) {
+        CustomerService.viewMyCars(currentUser);
+      }
+      await receiveCustomerSelection();
       break;
+    case '3':
+      if(currentUser) {
+        await CustomerService.makeOffer(currentUser);
+        EmployeeService.save();
+      }
+      break;
+    // case '4':
+    //   CustomerService.viewRemainingPayments();
     case 'q':
       exit();
       break;
-    // etc
     default:
-      console.log('Invalid Selection\n');
+      throw new Error('Invalid answer');
     }
+  }
+}
+
+export async function receiveUserSelection(): Promise<void> {
+  const response: string = await initialPrompt();
+
+  switch (response) {
+  case '0':
+    // Allow the User to register
+    await attemptRegister();
+    break;
+  case '1':
+    await loginCustomer();
+    break;
+  case '2':
+    await employeePrompt();
+    break;
+  case 'q':
+    exit();
+    break;
+    // etc
+  default:
+    console.log('Invalid Selection\n');
   }
 }
 
 export async function start() {
   await CustomerService.load();
   await EmployeeService.load();
+  await Lot.load();
   console.log('Start', CustomerService.customers);
+  console.log('Start', EmployeeService.offers);
+  console.log('Start', Lot.carsLot);
 
-  // eslint-disable-next-line no-constant-condition
-  while(true) {
-    try {
+  try {
+    // eslint-disable-next-line no-constant-condition
+    while(!currentUser) {
+      console.log('while loop');
       // eslint-disable-next-line no-await-in-loop
       await receiveUserSelection();
-    // eslint-disable-next-line no-empty
-    } catch(error) {}
+      // eslint-disable-next-line no-empty
+    }
+    while(currentUser) {
+      console.log(currentUser);
+      // eslint-disable-next-line no-await-in-loop
+      await receiveCustomerSelection();
+    }
+  } catch(error) {
+    console.log('loop error', error);
   }
 }
