@@ -2,3 +2,4 @@ build/
 coverage/
 log/
 node_modules/
+.env
