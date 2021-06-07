@@ -1,5 +1,23 @@
 import { rl } from '../../utils/inpututils';
 
+export function queryNumberOfYears(): Promise<number> {
+  return new Promise<number>((resolve) => {
+    rl.question(
+      'How many years to pay loan?',
+      (answer: string) => { resolve(Number(answer)); },
+    );
+  });
+}
+
+export function queryOfferAmount(): Promise<number> {
+  return new Promise<number>((resolve) => {
+    rl.question(
+      'How much is the offer?',
+      (answer: string) => { resolve(Number(answer)); },
+    );
+  });
+}
+
 export function queryCarModel(): Promise<string> {
   return new Promise<string>((resolve) => {
     rl.question(
