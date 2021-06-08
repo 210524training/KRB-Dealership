@@ -18,7 +18,6 @@ let currentUser: User | undefined;
 export default async function receiveUserSelection(): Promise<void> {
   let response: string;
   if(!currentUser) {
-    console.log(currentUser, 'TESTING *********************');
     response = await initialPrompt();
 
     switch (response) {
